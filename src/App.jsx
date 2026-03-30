@@ -1,32 +1,35 @@
-import { useState } from "react";
+import PlateCard from "./components/PlateCard";
+const plats = [
+  {
+    name: "Pizza",
+    price: 42,
+    is_available: true,
+    imageUrl: "/images/Pizza.jpg",
+  },
+  {
+    name: "Tajine",
+    price: 94,
+    is_available: false,
+    imageUrl: "/images/Tajine.jpg",
+  },
+  {
+    name: "Burger",
+    price: 55,
+    is_available: true,
+    imageUrl: "/images/Burger.jpg",
+  },
+];
 
 function App() {
-  const [numbers, setNumber] = useState([1, 2, 3]);
-
-  function handleAdd() {
-    const last = numbers[numbers.length - 1] || 0;
-    setNumber(prev => [...prev, last + 1]);
-  }
-
-  function handleRemove() {
-    setNumber(prev => prev.slice(0, -1));
-  }
-
   return (
     <>
-      <h1>Number list</h1>
+      <h1>MENU</h1>
 
-      {numbers.map((num) => (
-        <p key={num}>{num}</p>
-      ))}
-
-      <button onClick={handleAdd}>
-        Add number
-      </button>
-
-      <button onClick={handleRemove}>
-        Remove number
-      </button>
+      <div className="flex gap-4 p-2">
+        {plats.map((plat) => (
+          <PlateCard key={plat.id} {...plat} />
+        ))}
+      </div>
     </>
   );
 }
