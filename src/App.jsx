@@ -1,4 +1,8 @@
-import PlateCard from "./components/PlateCard";
+
+import Header from "./components/Header";
+
+import { useState } from "react";
+
 const plats = [
   {
     name: "Pizza",
@@ -20,16 +24,27 @@ const plats = [
   },
 ];
 
+
+
 function App() {
+  const [count, setCount] = useState(0);
   return (
     <>
-      <h1>MENU</h1>
+      <Header/>
 
-      <div className="flex gap-4 p-2">
+      {/* <div className="flex gap-4 p-2">
         {plats.map((plat) => (
           <PlateCard key={plat.id} {...plat} />
         ))}
-      </div>
+      </div> */}
+
+      <p>counter: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        +
+      </button>
+      <button onClick={() => setCount(count - 1)}>
+        -
+      </button>
     </>
   );
 }
