@@ -1,4 +1,3 @@
-
 import Header from "./components/Header";
 
 import { useState } from "react";
@@ -24,27 +23,24 @@ const plats = [
   },
 ];
 
-
-
 function App() {
-  const [count, setCount] = useState(0);
+  const [search, setSearch] = useState("");
+
+  const filtered = plats.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase()),
+  );
+  
   return (
     <>
-      <Header/>
-
-      {/* <div className="flex gap-4 p-2">
-        {plats.map((plat) => (
-          <PlateCard key={plat.id} {...plat} />
-        ))}
-      </div> */}
-
-      <p>counter: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        +
-      </button>
-      <button onClick={() => setCount(count - 1)}>
-        -
-      </button>
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border-2"
+      />
+      {filtered.map((f) => 
+        <p key={f.name}> {f.name} </p>  
+      )}
     </>
   );
 }
