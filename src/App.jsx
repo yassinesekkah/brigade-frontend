@@ -1,10 +1,7 @@
-import { useState } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
-  Link,
-  useLocation,
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -15,9 +12,9 @@ import Register from "./pages/Register";
 import PlateDetails from "./pages/PlateDetails";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import GuestRoute from "./components/GuestRoute";
 import Profile from "./pages/Profile";
 
-// ==================== APP ====================
 function App() {
   return (
     <AuthProvider>
@@ -26,12 +23,37 @@ function App() {
           <Header />
           <main className="flex-grow">
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/plates" element={<PlatesPage />} />
               <Route path="/plates/:id" element={<PlateDetails />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/Profile" element={<ProtectedRoute> <Profile /></ProtectedRoute>}
+
+              {/* Guest only routes (redirect if logged in) */}
+              <Route
+                path="/login"
+                element={
+                  <GuestRoute>
+                    <Login />
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <GuestRoute>
+                    <Register />
+                  </GuestRoute>
+                }
+              />
+
+              {/* Protected routes (require auth) */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
               />
             </Routes>
           </main>
