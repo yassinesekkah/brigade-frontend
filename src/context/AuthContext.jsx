@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/api";
 
+//1- hna kandeclariw container khawi
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -12,6 +13,7 @@ export function AuthProvider({ children }) {
     const initAuth = async () => {
       const token = localStorage.getItem("token");
 
+      //hna check if token value or null 
       if (!token) {
         setIsLoading(false);
         return;
@@ -34,6 +36,7 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
+    
   // Login: Store token and set user
   const login = (userData, token) => {
     localStorage.setItem("token", token);
