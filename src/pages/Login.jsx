@@ -7,8 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
   const [errMsg, setErrMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,31 +48,6 @@ function Login() {
       setIsLoading(false);
     }
   }
-
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   setErrMsg("");
-  //   setIsLoading(true);
-
-  //   try {
-  //     const response = await api.post("/login", {
-  //       email,
-  //       password,
-  //     });
-
-  //     const { user, token } = response.data;
-
-  //     // Save auth state
-  //     login(user, token);
-
-  //     // Redirect to intended destination
-  //     navigate(from, { replace: true });
-  //   } catch (error) {
-  //     setErrMsg("Email ou mot de passe incorrect");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center bg-gray-50 py-12 px-4">
