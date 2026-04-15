@@ -13,6 +13,7 @@ import api from "../services/api";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 
 // Register Page
 function Register() {
@@ -20,7 +21,25 @@ function Register() {
   const navigate = useNavigate();
 
   const [errMsg, setErrMsg] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const registerMutation = useMutation({
+    mutationFn: (data) => 
+      api.post("/register", {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      }),
+
+    onSuccess: (res) => {
+      const { user, token } = res.data;
+      login(user, token);
+      navigate("/");
+    },
+
+    onError: () => {
+      setErrMsg("Erreur lors de l'inscription");
+    },
+  });
 
   const schema = z
     .object({
@@ -45,27 +64,8 @@ function Register() {
     mode: "onChange",
   });
 
-  const onSubmit = async (data) => {
-    try {
-      setLoading(true);
-
-      const res = await api.post("/register", {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
-
-      const { user, token } = res.data;
-
-      login(user, token);
-
-      navigate("/");
-    } catch (err) {
-      console.log(err);
-      setErrMsg("Erreur lors de l'inscription");
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -163,11 +163,11 @@ function Register() {
 
             {errMsg && <p className="text-red-500">{errMsg}</p>}
             <button
-              disabled={loading || !isValid}
+              disabled={registerMutation.isPending || !isValid}
               type="submit"
               className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-md hover:shadow-lg"
             >
-              {loading ? "Inscription..." : "S'inscrire"}
+              {registerMutation.isPending ? "Inscription..." : "S'inscrire"}
             </button>
           </form>
           <p className="text-center text-gray-600 mt-6">
