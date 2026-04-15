@@ -2,6 +2,9 @@ import { useState } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,30 +19,61 @@ function Login() {
   // Get redirect destination (where user wanted to go before login)
   const from = location.state?.from || "/";
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setErrMsg("");
-    setIsLoading(true);
+  const schema = z.object({
+    email: z.email("Email invalid"),
+    password: z.string().min(8, "Minimum 8 caractères"),
+  });
 
-    try {
-      const response = await api.post("/login", {
-        email,
-        password,
-      });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onChange",
+  });
 
-      const { user, token } = response.data;
-
-      // Save auth state
+  const onSubmit = async (data) => {
+    try{
+      setIsLoading(true);
+      const res = await api.post("/login", data);
+      console.log(res.data);
+      const { user, token } = res.data;
       login(user, token);
+      navigate(form, { replace: true });
 
-      // Redirect to intended destination
-      navigate(from, { replace: true });
-    } catch (error) {
+    }catch(err){
+      console.log(err);
       setErrMsg("Email ou mot de passe incorrect");
-    } finally {
+    }finally{
       setIsLoading(false);
     }
-  };
+  }
+
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setErrMsg("");
+  //   setIsLoading(true);
+
+  //   try {
+  //     const response = await api.post("/login", {
+  //       email,
+  //       password,
+  //     });
+
+  //     const { user, token } = response.data;
+
+  //     // Save auth state
+  //     login(user, token);
+
+  //     // Redirect to intended destination
+  //     navigate(from, { replace: true });
+  //   } catch (error) {
+  //     setErrMsg("Email ou mot de passe incorrect");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center bg-gray-50 py-12 px-4">
@@ -49,7 +83,7 @@ function Login() {
           <p className="text-gray-600 mt-2">Connectez-vous à votre compte</p>
         </div>
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
@@ -61,13 +95,15 @@ function Login() {
                 type="email"
                 id="email"
                 name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
                 placeholder="votre@email.com"
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all disabled:bg-gray-100"
               />
+              {errors.email && (
+                <p className="text-red-500"> {errors.email.message} </p>
+              )}
             </div>
             <div>
               <label
@@ -80,13 +116,15 @@ function Login() {
                 type="password"
                 id="password"
                 name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
                 placeholder="••••••••"
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all disabled:bg-gray-100"
               />
+              {errors.password && (
+                <p className="text-red-500">{errors.password.message}</p>
+              )}
             </div>
             {errMsg && (
               <p className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">
@@ -95,7 +133,8 @@ function Login() {
             )}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !isValid}
+              
               className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
