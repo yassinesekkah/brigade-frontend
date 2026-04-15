@@ -5,9 +5,9 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 
 function Login() {
-
   const [errMsg, setErrMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,6 +17,20 @@ function Login() {
 
   // Get redirect destination (where user wanted to go before login)
   const from = location.state?.from || "/";
+
+  const loginMutation = useMutation({
+    mutationFn: (data) => api.post("/login", data),
+
+    onSuccess: (res) => {
+      const { user, token } = res.data;
+      login(user, token);
+      navigate(from);
+    },
+
+    onError: (err) => {
+      setErrMsg("Email ou mot de passe incorrect");
+    },
+  });
 
   const schema = z.object({
     email: z.email("Email invalid"),
@@ -32,22 +46,9 @@ function Login() {
     mode: "onChange",
   });
 
-  const onSubmit = async (data) => {
-    try{
-      setIsLoading(true);
-      const res = await api.post("/login", data);
-      console.log(res.data);
-      const { user, token } = res.data;
-      login(user, token);
-      navigate(form, { replace: true });
-
-    }catch(err){
-      console.log(err);
-      setErrMsg("Email ou mot de passe incorrect");
-    }finally{
-      setIsLoading(false);
-    }
-  }
+  const onSubmit = (data) => {
+    loginMutation.mutate(data);
+  };
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center bg-gray-50 py-12 px-4">
@@ -107,11 +108,10 @@ function Login() {
             )}
             <button
               type="submit"
-              disabled={isLoading || !isValid}
-              
+              disabled={loginMutation.isPending || !isValid}
               className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {isLoading ? (
+              {loginMutation.isPending ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Connexion...</span>
