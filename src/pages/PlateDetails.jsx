@@ -1,14 +1,25 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { plates } from "../data/plates";
+// import { plates } from "../data/plates";
+import { useQuery } from "@tanstack/react-query";
+import api from "../services/api";
 
 function PlateDetails() {
   const { id } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
 
-  const plate = plates.find((plate) => plate.id == id);
+  const {
+    data: plate,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["plate", id],
+    queryFn: () => api.get(`/plats/${id}`).then((res) => res.data),
+  });
+
+  // const plate = plates.find((plate) => plate.id == id);
 
   // Simulate loading
   useEffect(() => {
@@ -120,7 +131,7 @@ function PlateDetails() {
       <div className="max-w-4xl mx-auto">
         {/* Back button */}
         <Link
-          to="/plates"
+          to="/plats"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors duration-200 mb-6 group"
         >
           <svg
@@ -185,9 +196,7 @@ function PlateDetails() {
 
               {/* Description */}
               <p className="text-gray-600 leading-relaxed mb-6">
-                Un délicieux plat préparé avec des ingrédients frais et de
-                qualité. Savourez chaque bouchée de cette recette
-                traditionnelle revisitée avec une touche moderne.
+                {plate.description}
               </p>
 
               {/* AI Analysis Section */}
@@ -278,7 +287,7 @@ function PlateDetails() {
               {/* Analyze button */}
               <button
                 onClick={handleAnalyze}
-                disabled={isAnalyzing || !plate.is_available}
+                disabled={isAnalyzing}
                 className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${
                   plate.is_available
                     ? "bg-orange-500 hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/25 active:scale-[0.98]"

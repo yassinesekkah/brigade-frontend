@@ -25,8 +25,8 @@ function App() {
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
-              <Route path="/plates" element={<PlatesPage />} />
-              <Route path="/plates/:id" element={<PlateDetails />} />
+              <Route path="/plats" element={<PlatesPage />} />
+              <Route path="/plats/:id" element={<PlateDetails />} />
 
               {/* Guest only routes (redirect if logged in) */}
               <Route
