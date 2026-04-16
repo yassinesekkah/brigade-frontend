@@ -48,7 +48,7 @@ function Header() {
             <Link to="/" className={navLinkClass("/")}>
               Home
             </Link>
-            <Link to="/plates" className={navLinkClass("/plates")}>
+            <Link to="/plats" className={navLinkClass("/plats")}>
               Plates
             </Link>
 
